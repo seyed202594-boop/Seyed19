@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>مدیریت کارهای روزانه</title>
+</head>
+<body style="font-family:Arshia; text-align: center; background-color: lightcoral;">
+
+  <h1>یک کار وارد کنید</h1>
+  
+  <input id="taskInput" placeholder="چکار داری؟" type="text">
+  <input type="button" value="ثبت" onclick="addTask()">
+
+  <ul id="taskList" style="list-style: none; padding: 0;"></ul>
+
+  <script>
+    // --- ذخیره لیست در LocalStorage ---
+    function saveTasks() {
+      let tasks = [];
+      document.querySelectorAll("#taskList li span").forEach(span => {
+        tasks.push(span.textContent);
+      });
+      localStorage.setItem("tasks", JSON.stringify(tasks));
+    }
+
+    // --- بارگذاری لیست از LocalStorage ---
+    function loadTasks() {
+      let saved = localStorage.getItem("tasks");
+      if (saved) {
+        JSON.parse(saved).forEach(task => {
+          createTask(task);
+        });
+      }
+    }
+
+    // --- ایجاد یک آیتم کار ---
+    function createTask(taskText) {
+      let input = document.getElementById("taskInput");
+      let li = document.createElement("li");
+      li.style.margin = "8px 0";
+      li.style.background = "white";
+      li.style.padding = "8px";
+      li.style.borderRadius = "5px";
+      li.style.display = "flex";
+      li.style.justifyContent = "space-between";
+      li.style.alignItems = "center";
+
+      let span = document.createElement("span");
+      span.textContent = taskText;
+
+      // دکمه حذف
+      let deleteBtn = document.createElement("button");
+      deleteBtn.textContent = "❌";
+      deleteBtn.style.marginRight = "5px";
+      deleteBtn.onclick = function () {
+        li.remove();
+        saveTasks(); // آپدیت ذخیره
+      };
+
+      // دکمه ویرایش
+      let editBtn = document.createElement("button");
+      editBtn.textContent = "✏️";
+      editBtn.onclick = function () {
+        input.value = span.textContent; 
+        li.remove();
+        saveTasks(); // آپدیت ذخیره
+      };
+
+      let btnBox = document.createElement("div");
+      btnBox.appendChild(editBtn);
+      btnBox.appendChild(deleteBtn);
+
+      li.appendChild(span);
+      li.appendChild(btnBox);
+
+      document.getElementById("taskList").appendChild(li);
+      saveTasks(); // ذخیره در لوکال
+    }
+
+    // --- اضافه کردن کار جدید ---
+    function addTask() {
+      let input = document.getElementById("taskInput");
+      let taskText = input.value.trim();
+
+      if (taskText !== "") {
+        createTask(taskText);
+        input.value = "";
+      } else {
+        alert("لطفا یک متن وارد کنید!");
+      }
+    }
+
+    // --- وقتی صفحه لود شد، لیست قبلی بیاد ---
+    window.onload = loadTasks;
+  </script>
+</body>
+</html>
